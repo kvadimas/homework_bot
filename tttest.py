@@ -24,3 +24,12 @@ def check_tokens():
     else:
         print(2)
 check_tokens()
+
+a = 2
+if isinstance(a, int):
+    print(3)
+try:
+    isinstance(a, dict)
+    print(4)
+except ErrorAPIException as x:
+    print(x)
