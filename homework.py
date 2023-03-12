@@ -73,7 +73,7 @@ def get_api_answer(timestamp):
             raise ValueError(f'Код ответа от API {request.status_code}')
         logging.info(f'Ответ получен. Статус:{request.status_code}')
         homework = request.json()
-    except requests.exceptions.RequestException as error: 
+    except requests.exceptions.RequestException as error:
         raise error('Ошибка в ответе от сервера!')
     except ValueError as error:
         raise error('Ошибка json.')
