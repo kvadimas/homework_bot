@@ -55,6 +55,7 @@ def send_message(bot, message):
     """Отправляет сообщение в Telegram чат."""
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
+        logging.debug('Отправлено сообщение в тг.')
     except Exception:
         logging.error('Ошибка отправки сообщения')
 
@@ -72,6 +73,8 @@ def get_api_answer(timestamp):
             raise ValueError(f'Код ответа от API {request.status_code}')
         logging.info(f'Ответ получен. Статус:{request.status_code}')
         homework = request.json()
+    except requests.exceptions.RequestException as error: 
+        raise error('Ошибка в ответе от сервера!')
     except ValueError as error:
         raise error('Ошибка json.')
     return homework
@@ -132,7 +135,6 @@ def main():
                 message = parse_status(homework)
                 logging.info(message)
                 send_message(bot, message=message)
-                logging.debug('Отправлено сообщение в тг.')
                 status = homework['status']
                 timestamp = int(DT.datetime.strptime(
                     '2023-01-01 04:00:00',
