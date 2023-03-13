@@ -82,7 +82,6 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверяет ответ API на соответствие документации."""
-    print(response)
     if not isinstance(response, dict):
         raise TypeError('Не корректный ответ от API!')
     if 'homeworks' not in response:
@@ -127,23 +126,29 @@ def main():
             logging.debug('Запрос к эндпоинту API-ЯП.')
             response = get_api_answer(timestamp)
             logging.debug('Проверка ответа API.')
-            homework = check_response(response)
+            checked_hwk = check_response(response)
             logging.debug('Проверка ответа API: OK')
-            if len(homework) > 1:
-                homework = homework['homeworks'][0]
+            if len(checked_hwk) == 0:
+                continue
+            elif len(checked_hwk) > 1:
+                homework = checked_hwk['homeworks'][0]
+            else:
+                homework = checked_hwk
             if homework.get('status') != status:
                 message = parse_status(homework)
                 logging.info(message)
                 send_message(bot, message=message)
                 status = homework['status']
                 timestamp = int(DT.datetime.strptime(
-                    '2023-01-01 04:00:00',
-                    '%Y-%m-%d %H:%M:%S'
+                    homework['date_updated'],
+                    '%Y-%m-%dT%H:%M:%SZ'
                 ).timestamp())
+                logging.debug(f'Время запроса: {timestamp}')
             else:
                 logging.info('Нет новых статусов.')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
+            logging.info(message)
             send_message(bot, message)
         finally:
             time.sleep(RETRY_PERIOD)
