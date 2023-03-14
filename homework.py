@@ -128,13 +128,17 @@ def main():
             logging.debug('Проверка ответа API.')
             checked_hwk = check_response(response)
             logging.debug('Проверка ответа API: OK')
+            logging.debug(checked_hwk)
             if len(checked_hwk) == 0:
                 continue
             elif len(checked_hwk) > 1:
                 homework = checked_hwk['homeworks'][0]
             else:
-                homework = checked_hwk
-            if homework.get('status') != status:
+                homework = checked_hwk['homeworks']
+            if homework.get('status') == status:
+                logging.info('Нет новых статусов.')
+                continue
+            else:
                 message = parse_status(homework)
                 logging.info(message)
                 send_message(bot, message=message)
@@ -142,10 +146,8 @@ def main():
                 timestamp = int(DT.datetime.strptime(
                     homework['date_updated'],
                     '%Y-%m-%dT%H:%M:%SZ'
-                ).timestamp())
+                ).timestamp())  # timestamp из ответа сервера с домашками.
                 logging.debug(f'Время запроса: {timestamp}')
-            else:
-                logging.info('Нет новых статусов.')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.info(message)
