@@ -27,12 +27,6 @@ HOMEWORK_VERDICTS = {
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
-# ОТЛАДКА.
-time_test = int(DT.datetime.strptime(
-    '2023-01-01 04:00:00',
-    '%Y-%m-%d %H:%M:%S'
-).timestamp())
-# timestamp = time_test
 
 # Глобальная конфигурация для всех логгеров
 logging.basicConfig(
@@ -129,12 +123,9 @@ def main():
             checked_hwk = check_response(response)
             logging.debug('Проверка ответа API: OK')
             logging.debug(checked_hwk)
-            if len(checked_hwk) == 0:
+            if not checked_hwk['homeworks']:
                 continue
-            elif len(checked_hwk) > 1:
-                homework = checked_hwk['homeworks'][0]
-            else:
-                homework = checked_hwk['homeworks']
+            homework = checked_hwk['homeworks'][0]
             if homework.get('status') == status:
                 logging.info('Нет новых статусов.')
                 continue
@@ -143,10 +134,7 @@ def main():
                 logging.info(message)
                 send_message(bot, message=message)
                 status = homework['status']
-                timestamp = int(DT.datetime.strptime(
-                    homework['date_updated'],
-                    '%Y-%m-%dT%H:%M:%SZ'
-                ).timestamp())  # timestamp из ответа сервера с домашками.
+                timestamp = int(checked_hwk['current_date'])
                 logging.debug(f'Время запроса: {timestamp}')
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
