@@ -1,4 +1,3 @@
-import datetime as DT
 import logging
 import os
 import time
